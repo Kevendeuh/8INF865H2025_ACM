@@ -54,9 +54,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.unscramble.R
 import com.example.unscramble.ui.theme.UnscrambleTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun GameScreen() {
+fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
+    val gameUiState by gameViewModel.uiState.collectAsState()
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Column(
@@ -74,10 +78,13 @@ fun GameScreen() {
             style = typography.titleLarge,
         )
         GameLayout(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(mediumPadding)
+            currentScrambledWord = gameUiState.currentScrambledWord,
+
+            userGuess = gameViewModel.userGuess,
+            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
+            onKeyboardDone = { },
+
+
         )
         Column(
             modifier = Modifier
@@ -126,7 +133,11 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GameLayout(modifier: Modifier = Modifier) {
+fun GameLayout(currentScrambledWord: String,
+               userGuess: String,
+               onUserGuessChanged: (String) -> Unit,
+               onKeyboardDone: () -> Unit,
+               modifier: Modifier = Modifier,) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Card(
@@ -138,6 +149,11 @@ fun GameLayout(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(mediumPadding)
         ) {
+            Text(
+                text = currentScrambledWord,
+                fontSize = 45.sp,
+                modifier = modifier.align(Alignment.CenterHorizontally)
+            )
             Text(
                 modifier = Modifier
                     .clip(shapes.medium)
@@ -158,7 +174,7 @@ fun GameLayout(modifier: Modifier = Modifier) {
                 style = typography.titleMedium
             )
             OutlinedTextField(
-                value = "",
+                value = userGuess,
                 singleLine = true,
                 shape = shapes.large,
                 modifier = Modifier.fillMaxWidth(),
@@ -174,7 +190,7 @@ fun GameLayout(modifier: Modifier = Modifier) {
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { }
+                    onDone = { onKeyboardDone() }
                 )
             )
         }
@@ -217,6 +233,7 @@ private fun FinalScoreDialog(
         }
     )
 }
+
 
 @Preview(showBackground = true)
 @Composable
