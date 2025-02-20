@@ -84,8 +84,10 @@ fun GameScreen(gameViewModel: GameViewModel = viewModel()) {
             onKeyboardDone = { gameViewModel.checkUserGuess() },
             isGuessWrong = gameUiState.isGuessedWordWrong,
             wordCount = gameUiState.currentWordCount,
-
-
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(mediumPadding)
         )
         Column(
             modifier = Modifier
@@ -140,13 +142,15 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GameLayout(currentScrambledWord: String,
-               userGuess: String,
-               isGuessWrong: Boolean,
-               onUserGuessChanged: (String) -> Unit,
-               onKeyboardDone: () -> Unit,
-               wordCount: Int,
-               modifier: Modifier = Modifier,) {
+fun GameLayout(
+    currentScrambledWord: String,
+    userGuess: String,
+    isGuessWrong: Boolean,
+    onUserGuessChanged: (String) -> Unit,
+    onKeyboardDone: () -> Unit,
+    wordCount: Int,
+    modifier: Modifier = Modifier
+) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Card(
@@ -159,11 +163,6 @@ fun GameLayout(currentScrambledWord: String,
             modifier = Modifier.padding(mediumPadding)
         ) {
             Text(
-                text = currentScrambledWord,
-                fontSize = 45.sp,
-                modifier = modifier.align(Alignment.CenterHorizontally)
-            )
-            Text(
                 modifier = Modifier
                     .clip(shapes.medium)
                     .background(colorScheme.surfaceTint)
@@ -174,7 +173,7 @@ fun GameLayout(currentScrambledWord: String,
                 color = colorScheme.onPrimary
             )
             Text(
-                text = "scrambleun",
+                text = currentScrambledWord,
                 style = typography.displayMedium
             )
             Text(
@@ -192,7 +191,7 @@ fun GameLayout(currentScrambledWord: String,
                     unfocusedContainerColor = colorScheme.surface,
                     disabledContainerColor = colorScheme.surface,
                 ),
-                onValueChange = { },
+                onValueChange = onUserGuessChanged,
                 label = {
                     if (isGuessWrong) {
                         Text(stringResource(R.string.wrong_guess))

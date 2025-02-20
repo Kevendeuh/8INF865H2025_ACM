@@ -13,22 +13,25 @@ import com.example.unscramble.data.MAX_NO_OF_WORDS
 
 
 class GameViewModel : ViewModel(){
-    init {
-        resetGame()
-    }
-    var userGuess by mutableStateOf("")
-        private set
+
+
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
+
+    var userGuess by mutableStateOf("")
+        private set
 
     private lateinit var currentWord: String
     private var usedWords: MutableSet<String> = mutableSetOf()
 
+    init {
+        resetGame()
+    }
     private fun shuffleCurrentWord(word: String): String {
         val tempWord = word.toCharArray()
         // Scramble the word
         tempWord.shuffle()
-        while (String(tempWord).equals(word)) {
+        while (String(tempWord) == word) {
             tempWord.shuffle()
         }
         return String(tempWord)
@@ -36,11 +39,11 @@ class GameViewModel : ViewModel(){
     private fun pickRandomWordAndShuffle(): String {
         // Continue picking up a new random word until you get one that hasn't been used before
         currentWord = allWords.random()
-        if (usedWords.contains(currentWord)) {
-            return pickRandomWordAndShuffle()
+        return if (usedWords.contains(currentWord)) {
+            pickRandomWordAndShuffle()
         } else {
             usedWords.add(currentWord)
-            return shuffleCurrentWord(currentWord)
+            shuffleCurrentWord(currentWord)
         }
     }
 
